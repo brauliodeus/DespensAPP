@@ -1,0 +1,190 @@
+#:import FadeTransition kivy.uix.screenmanager.FadeTransition
+
+# =========================================================
+# Inclusión de Componentes y Pantallas Modulares - DespensAPP
+# =========================================================
+#:include kv/components.kv
+#:include kv/screens/splash_screen.kv
+#:include kv/screens/home_screen.kv
+#:include kv/screens/cart_screen.kv
+#:include kv/screens/pantry_screen.kv
+#:include kv/screens/lists_screen.kv
+#:include kv/screens/stats_screen.kv
+
+# =========================================================
+# Raíz de la Aplicación (Administrador Global de Pantallas)
+# =========================================================
+
+ScreenManager:
+    id: root_screen_manager
+    transition: FadeTransition(duration=0.3, clearcolor=[0, 0, 0, 0])
+
+    # -----------------------------------------------------
+    # 0. Pantalla de Bienvenida y Carga (Splash Screen)
+    # -----------------------------------------------------
+    SplashScreen:
+        name: "splash"
+
+    # -----------------------------------------------------
+    # 1. Contenedor Principal de la Aplicación
+    # -----------------------------------------------------
+    MDScreen:
+        name: "main_app"
+
+        BoxLayout:
+            orientation: "vertical"
+            size_hint: 1, 1
+
+            canvas.before:
+                Color:
+                    rgba: app.bg_color
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            # -------------------------------------------------
+            # Encabezado Superior (Logo + Título + Avatar)
+            # -------------------------------------------------
+            BoxLayout:
+                size_hint_y: None
+                height: "110dp"
+                padding: ["16dp", "10dp", "16dp", "10dp"]
+                spacing: "15dp"
+
+                # Logo Principal DespensAPP
+                AnchorLayout:
+                    size_hint: None, None
+                    size: "90dp", "90dp"
+                    pos_hint: {"center_y": 0.5}
+                    canvas.before:
+                        StencilPush
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [22, 22, 22, 22]
+                        StencilUse
+                        Color:
+                            rgba: 0.063, 0.141, 0.325, 1
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    canvas.after:
+                        StencilUnUse
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [22, 22, 22, 22]
+                        StencilPop
+
+                    Image:
+                        source: "docs/despensapp_logo.png"
+                        fit_mode: "contain"
+
+                # Título y Subtítulo de Pantalla
+                BoxLayout:
+                    orientation: "vertical"
+                    size_hint_x: 1
+                    pos_hint: {"center_y": 0.5}
+                    Label:
+                        text: "DespensAPP"
+                        font_size: "20sp"
+                        bold: True
+                        color: app.text_primary_color
+                        halign: "left"
+                        valign: "bottom"
+                        text_size: self.size
+                    Label:
+                        text: app.screen_header_tag
+                        font_size: "10sp"
+                        bold: True
+                        color: app.category_tag_color
+                        halign: "left"
+                        valign: "top"
+                        text_size: self.size
+
+                # Avatar Circular de Usuario
+                AvatarCircleButton:
+                    pos_hint: {"center_y": 0.5}
+                    on_release: app.toggle_menu_perfil()
+
+            # -------------------------------------------------
+            # Contenedor Principal (Tarjeta Sabia Redondeada)
+            # -------------------------------------------------
+            BoxLayout:
+                orientation: "vertical"
+                size_hint: 1, 1
+                padding: ["14dp", "4dp", "14dp", "8dp"]
+
+                BoxLayout:
+                    orientation: "vertical"
+                    size_hint: 1, 1
+                    padding: ["16dp", "16dp", "16dp", "16dp"]
+                    spacing: "10dp"
+
+                    canvas.before:
+                        Color:
+                            rgba: app.sage_container_color
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [28, 28, 28, 28]
+
+                    # =========================================
+                    # Administrador de Pantallas Interno
+                    # =========================================
+                    ScreenManager:
+                        id: screen_manager
+                        transition: FadeTransition(duration=0.15, clearcolor=[0, 0, 0, 0])
+
+                        HomeScreen:
+                        CartScreen:
+                        PantryScreen:
+                        ListsScreen:
+                        StatsScreen:
+
+            # -------------------------------------------------
+            # Barra de Navegación Inferior (5 Pestañas)
+            # -------------------------------------------------
+            BoxLayout:
+                orientation: "horizontal"
+                size_hint_y: None
+                height: "64dp"
+                padding: ["10dp", "4dp", "10dp", "4dp"]
+                spacing: "6dp"
+
+                canvas.before:
+                    Color:
+                        rgba: app.bg_color
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+
+                BottomNavButton:
+                    icon_name: "home-outline"
+                    label_text: "Inicio"
+                    screen_target: "home"
+                    is_active: app.current_screen_name == "home"
+
+                BottomNavButton:
+                    icon_name: "cart-outline"
+                    label_text: "Compras"
+                    screen_target: "cart"
+                    is_active: app.current_screen_name == "cart"
+
+                BottomNavButton:
+                    icon_name: "cupboard-outline"
+                    label_text: "Despensa"
+                    screen_target: "cupboard"
+                    is_active: app.current_screen_name == "cupboard"
+
+                BottomNavButton:
+                    icon_name: "clipboard-text-outline"
+                    label_text: "Listas"
+                    screen_target: "lists"
+                    is_active: app.current_screen_name == "lists"
+
+                BottomNavButton:
+                    icon_name: "finance"
+                    label_text: "Estadísticas"
+                    screen_target: "stats"
+                    is_active: app.current_screen_name == "stats"
